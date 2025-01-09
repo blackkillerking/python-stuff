@@ -21,7 +21,7 @@ class Author_Serializer (serializers.Serializer):
 class Categories_Serializer (serializers.Serializer):
     name = serializers.CharField(max_length=255, allow_blank=False, allow_null=False, required=True)
     description = serializers.CharField(max_length=500, allow_blank=False, allow_null=False, required=True)
-    # category_image = serializers.ImageField(upload_to='category/image/', allow_null=False, required=True)
+    category_image = serializers.ImageField(allow_null=False, required=True)
     
     def validate(self, data):
         if data['name'] == "" or None:
@@ -32,10 +32,10 @@ class Categories_Serializer (serializers.Serializer):
             raise serializers.ValidationError({
                 'Category_description':"Must input a category description"
             })
-        # if data['category_image'] == None:
-        #     raise serializers.ValidationError({
-        #         'Category_category_image':"Must input a category image"
-        #     })
+        if data['category_image'] == None:
+            raise serializers.ValidationError({
+                'Category_category_image':"Must input a category image"
+            })
         return data
 
 
@@ -56,7 +56,7 @@ class Readers_Serializer (serializers.Serializer):
     user_name = serializers.CharField(max_length=255, allow_blank=False, allow_null=False, required=True)
     email = serializers.EmailField(max_length=254, allow_blank=True, allow_null=True, required=False)
     profile_picture = serializers.ImageField(allow_null=True, required=False)
-    favorite_books = Reader_Favorite_Books_Serializer(many=True)
+    # favorite_books = Reader_Favorite_Books_Serializer(many=True)
     
     def validate(self, data):
         if data['user_name'] == "" or None:
@@ -92,7 +92,7 @@ class Reveiwer_Text_Serializer (serializers.Serializer):
 class Reveiwer_Serializer (serializers.Serializer):
     user_name = serializers.CharField(max_length=255, allow_blank=False, allow_null=False, required=True)
     email = serializers.EmailField(max_length=254, allow_blank=True, allow_null=True, required=False)
-    reveiwer_text = Reveiwer_Text_Serializer()
+    # reveiwer_text = Reveiwer_Text_Serializer()
     
     def validate(self, data):
         if data['user_name'] == "" or None:
