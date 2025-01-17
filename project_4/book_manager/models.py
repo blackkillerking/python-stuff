@@ -23,7 +23,7 @@ class Readers (models.Model):
     user_name = models.CharField(max_length=255, blank=False, null=False)
     email = models.EmailField(max_length=254, blank=True, null=True)
     profile_picture = models.ImageField(upload_to='readers/profile_picture/', null=True)
-    favorite_books = models.ForeignKey(Reader_Favorite_Books, on_delete=models.CASCADE, related_name='favorite_books')
+    favorite_books = models.ManyToManyField(Reader_Favorite_Books, related_name='favorite_books')
     
     
 class Reviewer_Text (models.Model):
@@ -34,14 +34,14 @@ class Reviewer_Text (models.Model):
 class Reviewer (models.Model):
     user_name = models.CharField(max_length=255, blank=False, null=False)
     email = models.EmailField(max_length=254, blank=True, null=True)
-    reviewer_texts = models.ForeignKey(Reviewer_Text, on_delete=models.CASCADE, related_name='reveiwer_text') # change to foreign key
+    reviewer_texts = models.ManyToManyField(Reviewer_Text, related_name='reviewer_text') # change to foreign key
     
     
     
 class Book_Review_Page (models.Model):
     # add dynamic average rating here
     # add dynamic total readers and reveiers here
-    reviewers = models.ForeignKey(Reviewer, on_delete=models.CASCADE, related_name='reveiwers')
+    reviewers = models.ManyToManyField(Reviewer, related_name='reviewers')
     
     
 class Book (models.Model):
@@ -57,7 +57,7 @@ class Book (models.Model):
     category = models.ManyToManyField(Categories, related_name='category')
     reader = models.ManyToManyField(Readers, related_name='reader')
     
-    reveiw_page = models.ForeignKey(Book_Review_Page, on_delete=models.CASCADE, related_name='reveiw_page')
+    review_page = models.ForeignKey(Book_Review_Page, on_delete=models.CASCADE, related_name='review_page', default=None)
     
     
 

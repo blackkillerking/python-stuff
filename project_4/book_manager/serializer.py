@@ -3,6 +3,7 @@ from .models import *
 
 
 class Author_Serializer (serializers.Serializer):
+    id = serializers.IntegerField(allow_null=True, required=False)
     name = serializers.CharField(max_length=255, allow_blank=False, allow_null=False, required=True)
     email = serializers.EmailField(max_length=254, allow_blank=True, allow_null=True, required=False)
     
@@ -19,9 +20,9 @@ class Author_Serializer (serializers.Serializer):
         return data
     
 class Categories_Serializer (serializers.Serializer):
+    id = serializers.IntegerField(allow_null=True, required=False)
     name = serializers.CharField(max_length=255, allow_blank=False, allow_null=False, required=True)
     description = serializers.CharField(max_length=500, allow_blank=False, allow_null=False, required=True)
-    category_image = serializers.ImageField(allow_null=True, required=False)
     
     def validate(self, data):
         if data['name'] == "" or None:
@@ -33,9 +34,14 @@ class Categories_Serializer (serializers.Serializer):
                 'Category_description':"Must input a category description"
             })
         return data
+    
+    
+class Category_Image_Serializer (serializers.Serializer):
+    category_image = serializers.ImageField(allow_null=True, required=False)
 
 
 class Tags_Serializer (serializers.Serializer):
+    id = serializers.IntegerField(allow_null=True, required=False)
     name = serializers.CharField(max_length=255, allow_blank=False, allow_null=False, required=True)
     
     def validate(self, data):
@@ -49,9 +55,9 @@ class Reader_Favorite_Books_Serializer (serializers.Serializer):
     book_id = serializers.IntegerField(allow_null=True, required=False)
     
 class Readers_Serializer (serializers.Serializer):
+    id = serializers.IntegerField(allow_null=True, required=False)
     user_name = serializers.CharField(max_length=255, allow_blank=False, allow_null=False, required=True)
     email = serializers.EmailField(max_length=254, allow_blank=True, allow_null=True, required=False)
-    # profile_picture = serializers.ImageField(allow_null=True, required=False)
     
     # favorite_books = Reader_Favorite_Books_Serializer(many=True)
     
@@ -60,12 +66,13 @@ class Readers_Serializer (serializers.Serializer):
             raise serializers.ValidationError({
                 'Reader_user_name':'Must input a reader username'
             })
-        # if data['profile_picture'] == None:
-        #     raise serializers.ValidationError({
-        #         'Reader_profile_picture':'Must input a reader profile picture'
-        #     })
         return data
     
+    
+class Readers_ProfilePicture_Serializer (serializers.Serializer):
+    profile_picture = serializers.ImageField(allow_null=True, required=False)
+
+
 class Reviewer_Text_Serializer (serializers.Serializer):
     review_text = serializers.CharField(max_length=255, allow_blank=False, allow_null=False, required=True)
     rating = serializers.IntegerField(allow_null=True, required=False)
@@ -80,17 +87,19 @@ class Reviewer_Text_Serializer (serializers.Serializer):
             raise serializers.ValidationError({
                 'Review_text':'Must input a review'
             })
-        if data['rating'] not in [1, 2, 3, 4, 5]:
-            raise serializers.ValidationError({
-                'Invalid_rating':'Must input a rating between 1 and 5'
-            })
-        return data
+        if data['rating'] != None:
+            if data['rating'] not in [1, 2, 3, 4, 5]:
+                raise serializers.ValidationError({
+                    'Invalid_rating':'Must input a rating between 1 and 5'
+                })
+            return data
+    
     
 class Reviewer_Serializer (serializers.Serializer):
     user_name = serializers.CharField(max_length=255, allow_blank=False, allow_null=False, required=True)
     email = serializers.EmailField(max_length=254, allow_blank=True, allow_null=True, required=False)
     
-    reveiwer_text = Reviewer_Text_Serializer()
+    reviewer_texts = Reviewer_Text_Serializer(many=True)
     
     def validate(self, data):
         if data['user_name'] == "" or None:
@@ -99,10 +108,13 @@ class Reviewer_Serializer (serializers.Serializer):
             })
         return super().validate(data)
     
+    
 class Book_Review_Page_Serializer (serializers.Serializer):
-    reveiwers = Reviewer_Serializer(many=True)
+    reviewers = Reviewer_Serializer(many=True)
+    
     
 class Book_Serializer (serializers.Serializer):
+    id = serializers.IntegerField(allow_null=True, required=False)
     title = serializers.CharField(max_length=255, allow_blank=False, allow_null=False, required=True)
     description = serializers.CharField(max_length=500, allow_blank=False, allow_null=False, required=True)
     publication_date = serializers.DateField()
@@ -115,7 +127,7 @@ class Book_Serializer (serializers.Serializer):
     tags = Tags_Serializer(many=True)
     categories = Categories_Serializer(many=True)
     
-    # reveiw_page = Book_Review_Page_Serializer()
+    review_page = Book_Review_Page_Serializer()
     
     def validate(self, data):
         if data['title'] == "" or None:
@@ -144,6 +156,8 @@ class Book_Serializer (serializers.Serializer):
             })
         
         return super().validate(data)
+    
+    
     
     
 class Author_ModelSerializer (serializers.ModelSerializer):
@@ -202,8 +216,8 @@ class Book_ModelSerializer (serializers.ModelSerializer):
         fields = ['id', 
                   'title', 
                   'description', 
-                  'publication_date', 
-                  'cover_image', 
+                  'publication_date',
+                  'cover_image',
                   'sample_pdf', 
                   'is_published',
                   'author',
